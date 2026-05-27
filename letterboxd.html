@@ -1,1 +1,797 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Letterboxd SQL Case Study — Data Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #faf9f6;
+      --surface: #f3f1ec;
+      --border: #e2dfd8;
+      --text: #1a1916;
+      --muted: #6b6860;
+      --accent: #1a1916;
+      --tag-bg: #eceae4;
+      --code-bg: #f0ede6;
+      --serif: 'DM Serif Display', Georgia, serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
+      --mono: 'DM Mono', 'Courier New', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.7;
+      font-weight: 400;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    .nav-logo {
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-logo .star { color: var(--muted); }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav ul a {
+      font-size: 14px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    nav ul a:hover { color: var(--text); }
+
+    /* LAYOUT */
+    .container {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 5rem 0 3.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .breadcrumb {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 1.75rem;
+    }
+
+    .tag {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--tag-bg);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      letter-spacing: 0.01em;
+    }
+
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 1.25rem;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 580px;
+      margin-bottom: 2.5rem;
+    }
+
+    /* METRICS */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .metric {
+      background: var(--surface);
+      padding: 1.25rem 1rem;
+      text-align: center;
+    }
+
+    .metric-val {
+      font-family: var(--serif);
+      font-size: 1.75rem;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .metric-lbl {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* SECTIONS */
+    section {
+      padding: 3.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: 1.75rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 1rem;
+      line-height: 1.25;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      margin: 2rem 0 0.5rem;
+    }
+
+    p {
+      color: var(--muted);
+      margin-bottom: 1rem;
+      font-size: 16px;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    /* CHALLENGE GRID */
+    .challenge-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 1.5rem;
+    }
+
+    .challenge-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .challenge-card .icon {
+      font-size: 20px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .challenge-card h4 {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .challenge-card p {
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* LEVELS */
+    .levels { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1px; }
+
+    .level {
+      display: flex;
+      gap: 1.25rem;
+      padding: 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      transition: background 0.2s;
+    }
+
+    .level:hover { background: var(--tag-bg); }
+
+    .level-num {
+      min-width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .level-body h4 {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .level-body p { font-size: 13px; margin: 0; }
+
+    /* CODE BLOCKS */
+    .code-wrap {
+      margin: 1.25rem 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .code-label {
+      background: var(--border);
+      padding: 6px 14px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    pre {
+      background: var(--code-bg);
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      margin: 0;
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    .kw { color: #6b6860; font-weight: 500; }
+    .fn { color: #3d3b36; }
+    .cm { color: #a8a49d; font-style: italic; }
+    .st { color: #5a5650; }
+
+    /* FINDINGS */
+    .findings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 1.5rem;
+    }
+
+    .finding {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .finding .icon { font-size: 20px; margin-bottom: 10px; display: block; }
+
+    .finding h4 {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
+    .finding p { font-size: 13px; margin: 0; }
+
+    /* LEARNINGS */
+    .learning-item {
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 1rem;
+    }
+
+    .learning-item:last-child { border-bottom: none; }
+
+    .learning-num {
+      font-family: var(--serif);
+      font-size: 1.5rem;
+      color: var(--border);
+      line-height: 1;
+      min-width: 32px;
+      padding-top: 2px;
+    }
+
+    .learning-item h4 {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .learning-item p { font-size: 14px; margin: 0; }
+
+    /* NEXT */
+    .next-list { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 8px; }
+
+    .next-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .next-item .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+      margin-top: 7px;
+    }
+
+    /* STACK */
+    .stack-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 1.25rem;
+    }
+
+    .pill {
+      font-size: 13px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    /* FOOTER CTA */
+    .footer-cta {
+      padding: 4rem 0;
+      text-align: center;
+    }
+
+    .footer-cta p {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 22px;
+      border-radius: 999px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+    }
+
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    .btn-primary:hover { background: #3d3b36; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+    }
+
+    .btn-secondary:hover { background: var(--surface); }
+
+    /* SITE FOOTER */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero h1, .hero-sub, .tags, .metrics {
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .hero-sub { animation-delay: 0.07s; }
+    .tags { animation-delay: 0.04s; }
+    .metrics { animation-delay: 0.14s; }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      .challenge-grid, .findings-grid { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+      nav ul { display: none; }
+      .hero { padding: 3rem 0 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">your name<span class="star">✦</span></a>
+    <ul>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#projects">Work</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div class="container">
+    <div class="hero">
+      <div class="breadcrumb">
+        <a href="index.html">Work</a>
+        <span>→</span>
+        <span>Letterboxd SQL Analysis</span>
+      </div>
+
+      <div class="tags">
+        <span class="tag">PostgreSQL</span>
+        <span class="tag">SQL</span>
+        <span class="tag">Data Analysis</span>
+        <span class="tag">Personal Project</span>
+        <span class="tag">In Progress</span>
+      </div>
+
+      <h1>Two friends. 500+ films.<br><em>Who has better taste?</em></h1>
+
+      <p class="hero-sub">A personal SQL project built on real Letterboxd export data — analysing watching habits, rating patterns, and taste disagreements across two people's film diaries.</p>
+
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-val">2</div>
+          <div class="metric-lbl">People's data</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">500+</div>
+          <div class="metric-lbl">Films tracked</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">4</div>
+          <div class="metric-lbl">Skill levels</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">4</div>
+          <div class="metric-lbl">Tables joined</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACKGROUND -->
+  <section>
+    <div class="container">
+      <div class="section-label">Background</div>
+      <h2>A dataset hiding in plain sight</h2>
+      <p>I watch a lot of films. So does my friend Nirjan. We argue about them constantly.</p>
+      <p>At some point it occurred to me that we were sitting on a dataset — both of us had been logging watches, ratings, and reviews on Letterboxd for years. So instead of debating who has better taste, I decided to actually look at the data.</p>
+      <p>I exported both our Letterboxd diaries as CSVs, imported them into a shared PostgreSQL database, and wrote queries to compare our watching habits, rating patterns, and biggest points of disagreement. What started as SQL practice turned into something I genuinely wanted to explore.</p>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section>
+    <div class="container">
+      <div class="section-label">The problem</div>
+      <h2>Real data is never clean</h2>
+      <p>Letterboxd's CSV export is designed for one person. To do a meaningful cross-person analysis, several real problems had to be solved before writing a single interesting query.</p>
+
+      <div class="challenge-grid">
+        <div class="challenge-card">
+          <span class="icon">⚠️</span>
+          <h4>Schema mismatch</h4>
+          <p>My export used capitalised column names ("Name", "Date") while Nirjan's used lowercase. Every query touching both tables needed careful aliasing.</p>
+        </div>
+        <div class="challenge-card">
+          <span class="icon">🧹</span>
+          <h4>Dirty data</h4>
+          <p>Rewatches created duplicates. Missing ratings made numerical comparison impossible. Inconsistent film titles caused joins to silently miss matches.</p>
+        </div>
+        <div class="challenge-card">
+          <span class="icon">🔑</span>
+          <h4>No shared key</h4>
+          <p>Letterboxd doesn't export unique film IDs. The film name was the only join key — fragile and requiring manual cleanup.</p>
+        </div>
+        <div class="challenge-card">
+          <span class="icon">👥</span>
+          <h4>Multi-person logic</h4>
+          <p>Most SQL tutorials cover one table. Cross-person analysis required UNION ALL, LEFT JOIN with IS NULL, and careful thinking about what "both watched" means in query terms.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPROACH -->
+  <section>
+    <div class="container">
+      <div class="section-label">Approach</div>
+      <h2>A deliberate skill progression</h2>
+      <p>Rather than jumping straight to complex queries, I built up in levels — each one unlocking the next set of questions I could ask.</p>
+
+      <div class="levels">
+        <div class="level">
+          <div class="level-num">1</div>
+          <div class="level-body">
+            <h4>SELECT, WHERE, ORDER BY</h4>
+            <p>Simple queries to understand the data's shape — what years are covered, how dates are formatted, whether the import worked correctly.</p>
+          </div>
+        </div>
+        <div class="level">
+          <div class="level-num">2</div>
+          <div class="level-body">
+            <h4>GROUP BY, COUNT, AVG, ROUND</h4>
+            <p>Aggregating by year to find average ratings over time and total films watched per period. Surfaced early patterns in watching habits.</p>
+          </div>
+        </div>
+        <div class="level">
+          <div class="level-num">3</div>
+          <div class="level-body">
+            <h4>JOINs — single person</h4>
+            <p>Joined diary, reviews, and watchlist tables. Used LEFT JOIN with IS NULL to find films watched but never reviewed.</p>
+          </div>
+        </div>
+        <div class="level">
+          <div class="level-num">4</div>
+          <div class="level-body">
+            <h4>JOINs — cross-person comparison</h4>
+            <p>Joined my diary against Nirjan's to find shared watches, rating gaps, biggest disagreements, and films only one of us has seen.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Key queries</h3>
+
+      <div class="code-wrap">
+        <div class="code-label">SQL — Biggest rating disagreements</div>
+        <pre><code><span class="kw">SELECT</span> d."Name",
+       d."Rating"  <span class="kw">AS</span> my_rating,
+       n.rating    <span class="kw">AS</span> nirjan_rating
+<span class="kw">FROM</span> diary d
+<span class="kw">JOIN</span> nirjan_diary n <span class="kw">ON</span> d."Name" = n.name
+<span class="kw">ORDER BY</span> <span class="fn">ABS</span>(d."Rating" - n.rating) <span class="kw">DESC</span>;</code></pre>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-label">SQL — Films Nirjan watched that I haven't</div>
+        <pre><code><span class="cm">-- A built-in recommendation engine</span>
+<span class="kw">SELECT</span> n.name
+<span class="kw">FROM</span> nirjan_diary n
+<span class="kw">LEFT JOIN</span> diary d <span class="kw">ON</span> n.name = d."Name"
+<span class="kw">WHERE</span> d."Name" <span class="kw">IS NULL</span>;</code></pre>
+      </div>
+
+      <div class="code-wrap">
+        <div class="code-label">SQL — Who watched more in 2024</div>
+        <pre><code><span class="kw">SELECT</span> <span class="st">'me'</span>     <span class="kw">AS</span> whose, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> films_watched
+<span class="kw">FROM</span> diary
+<span class="kw">WHERE</span> <span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> "Date") = 2024
+<span class="kw">UNION ALL</span>
+<span class="kw">SELECT</span> <span class="st">'nirjan'</span>, <span class="fn">COUNT</span>(*)
+<span class="kw">FROM</span> nirjan_diary
+<span class="kw">WHERE</span> <span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> date) = 2024;</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINDINGS -->
+  <section>
+    <div class="container">
+      <div class="section-label">Key findings</div>
+      <h2>What the data actually said</h2>
+
+      <div class="findings-grid">
+        <div class="finding">
+          <span class="icon">⭐</span>
+          <h4>We agree more than we argue</h4>
+          <p>Most shared watches have ratings within half a star. The genuine disagreements are fewer than expected — but more dramatic when they exist.</p>
+        </div>
+        <div class="finding">
+          <span class="icon">📅</span>
+          <h4>Nirjan watches more, I rate higher</h4>
+          <p>Nirjan logs more films per year and tends to be the more critical rater. My average rating across shared watches runs higher — I'm more generous, he's harder to impress.</p>
+        </div>
+        <div class="finding">
+          <span class="icon">🎬</span>
+          <h4>Disagreements cluster on prestige films</h4>
+          <p>The biggest rating gaps aren't on obscure picks — they're the films everyone has an opinion on. The canon is contested.</p>
+        </div>
+        <div class="finding">
+          <span class="icon">📋</span>
+          <h4>His diary is my watchlist</h4>
+          <p>A large share of films I've saved to watch, Nirjan has already seen — making his diary a better filter than the algorithm.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEARNINGS -->
+  <section>
+    <div class="container">
+      <div class="section-label">What I learned</div>
+      <h2>Beyond the syntax</h2>
+
+      <div style="margin-top: 1.5rem;">
+        <div class="learning-item">
+          <div class="learning-num">01</div>
+          <div>
+            <h4>Schema issues are real, not academic</h4>
+            <p>Capitalised vs. lowercase column names is exactly the kind of thing that breaks production queries. Working through it manually made the lesson stick in a way no tutorial ever did.</p>
+          </div>
+        </div>
+        <div class="learning-item">
+          <div class="learning-num">02</div>
+          <div>
+            <h4>The join key matters enormously</h4>
+            <p>Using film names as a join key works until it doesn't — one trailing space, one alternate title, and the match fails silently. The fix is proper IDs, which is what the TMDB enrichment phase will address.</p>
+          </div>
+        </div>
+        <div class="learning-item">
+          <div class="learning-num">03</div>
+          <div>
+            <h4>Good questions lead to better queries</h4>
+            <p>Starting with "who has better taste?" forced me to define what that actually means in SQL — rating averages, disagreement magnitude, overlap percentage. Translating a real question into a query is a different skill from knowing syntax.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEXT -->
+  <section>
+    <div class="container">
+      <div class="section-label">What's next</div>
+      <h2>The project is still running</h2>
+
+      <div class="next-list">
+        <div class="next-item">
+          <span class="dot"></span>
+          <span><strong>TMDB API enrichment</strong> — pull genre, runtime, director, and country data for every film to unlock genre-level and decade-level analysis</span>
+        </div>
+        <div class="next-item">
+          <span class="dot"></span>
+          <span><strong>Streamlit or Tableau dashboard</strong> — make the findings interactive and visual, not just query output in a terminal</span>
+        </div>
+        <div class="next-item">
+          <span class="dot"></span>
+          <span><strong>Scale to more friends</strong> — redesign the schema to support N people cleanly with a unified diary table and user_id foreign key</span>
+        </div>
+        <div class="next-item">
+          <span class="dot"></span>
+          <span><strong>Recommendation engine</strong> — "films Nirjan rated 4+ stars that I haven't seen" is already a query. With genre data, it becomes genuinely useful</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section>
+    <div class="container">
+      <div class="section-label">Tech stack</div>
+      <h2>Tools used</h2>
+      <div class="stack-pills">
+        <span class="pill">PostgreSQL</span>
+        <span class="pill">SQL</span>
+        <span class="pill">pgAdmin / DBeaver</span>
+        <span class="pill">Letterboxd CSV export</span>
+        <span class="pill">Python (import)</span>
+        <span class="pill">UNION ALL</span>
+        <span class="pill">LEFT JOIN</span>
+        <span class="pill">EXTRACT</span>
+        <span class="pill">ABS()</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER CTA -->
+  <div class="container">
+    <div class="footer-cta">
+      <p>Want to see the queries, talk about the project, or do something similar with your own data?</p>
+      <div class="btn-row">
+        <a href="https://github.com" class="btn btn-primary">View on GitHub ↗</a>
+        <a href="index.html#contact" class="btn btn-secondary">Get in touch</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SITE FOOTER -->
+  <footer class="site-footer">
+    crafted with ✦ and lots of data · © 2025 your name
+  </footer>
+
+</body>
+</html>
