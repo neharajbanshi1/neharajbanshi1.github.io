@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+:root{
+  --bg:        #e8ddd4;   /* warm sandy taupe — the base */
+  --bg2:       #dfd3c8;   /* one shade deeper */
+  --bg3:       #d4c5b8;   /* section bg */
+  --card:      #ede4db;   /* card surface */
+  --rose:      #c9606e;   /* deep dusty rose */
+  --rose-dim:  #e0a0a8;   /* softer rose */
+  --violet:    #7b6fa8;   /* muted plum */
+  --violet-dim:#b0a8cf;
+  --sage:      #5a8f76;   /* deep sage */
+  --sage-dim:  #9dc4b0;
+  --amber:     #c08840;   /* warm amber */
+  --amber-dim: #deb87a;
+  --ink:       #2c1f2a;   /* near-black with warmth */
+  --mid:       #6b5558;
+  --muted:     #9e8880;
+  --border:    rgba(44,31,42,0.1);
+}
+
+body{
+  font-family:'Jost',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  overflow-x:hidden;
+}
+
+/* subtle grain */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9000;
+  opacity:0.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  padding:1.3rem 5rem;
+  display:flex;justify-content:space-between;align-items:center;
+  transition:all 0.4s;
+}
+nav.scrolled{
+  background:rgba(232,221,212,0.88);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+  padding:0.85rem 5rem;
+}
+.nav-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.3rem;font-weight:500;letter-spacing:0.05em;
+  color:var(--ink);text-decoration:none;
+}
+.nav-logo sup{font-size:0.6em;color:var(--rose);vertical-align:super}
+.nav-links{display:flex;gap:2.4rem;list-style:none}
+.nav-links a{
+  font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;transition:color 0.2s;
+}
+.nav-links a:hover{color:var(--rose)}
+
+/* ── HERO ── */
+#home{
+  min-height:100vh;
+  display:grid;grid-template-columns:1fr 380px;
+  align-items:center;
+  padding:8rem 5rem 5rem;
+  gap:3rem;
+  position:relative;overflow:hidden;
+  background:var(--bg);
+}
+
+/* big decorative rings */
+.ring{
+  position:absolute;border-radius:50%;
+  border:1px solid rgba(44,31,42,0.07);
+  pointer-events:none;
+}
+.ring1{width:680px;height:680px;right:-200px;top:50%;transform:translateY(-50%)}
+.ring2{width:480px;height:480px;right:-100px;top:50%;transform:translateY(-50%)}
+.ring3{width:260px;height:260px;right:40px;top:50%;transform:translateY(-50%)}
+
+/* ink blob */
+.ink-blob{
+  position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;
+}
+.ib1{width:500px;height:400px;background:rgba(201,96,110,0.12);top:-60px;right:-80px}
+.ib2{width:350px;height:350px;background:rgba(123,111,168,0.1);bottom:-60px;left:-80px}
+
+.hero-l{position:relative;z-index:2}
+
+.hero-tag{
+  display:inline-flex;align-items:center;gap:0.7rem;
+  border:1px solid rgba(201,96,110,0.3);
+  border-radius:50px;padding:0.4rem 1rem 0.4rem 0.45rem;
+  margin-bottom:2rem;
+  opacity:0;animation:up 0.6s 0.1s ease forwards;
+}
+.hero-tag-dot{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--rose);display:flex;align-items:center;justify-content:center;
+  color:white;font-size:0.6rem;letter-spacing:0.05em;
+}
+.hero-tag span{font-size:0.74rem;letter-spacing:0.1em;color:var(--rose)}
+
+h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3.8rem,6.5vw,6.8rem);
+  line-height:0.98;font-weight:500;
+  margin-bottom:1.8rem;
+  opacity:0;animation:up 0.7s 0.25s ease forwards;
+}
+h1 em{font-style:italic;color:var(--rose)}
+h1 .ghost{
+  -webkit-text-stroke:1.2px var(--ink);
+  color:transparent;
+}
+
+.hero-desc{
+  font-size:1rem;color:var(--mid);line-height:1.85;
+  max-width:420px;margin-bottom:3rem;font-weight:300;
+  opacity:0;animation:up 0.7s 0.4s ease forwards;
+}
+
+.hero-btns{
+  display:flex;align-items:center;gap:1.5rem;
+  opacity:0;animation:up 0.7s 0.55s ease forwards;
+}
+.btn-fill{
+  background:var(--rose);color:white;border:none;
+  padding:0.95rem 2.4rem;border-radius:50px;
+  font-family:'Jost',sans-serif;font-size:0.85rem;font-weight:500;
+  letter-spacing:0.06em;cursor:pointer;
+  transition:background 0.25s,transform 0.25s,box-shadow 0.25s;
+}
+.btn-fill:hover{background:#b8505e;transform:translateY(-2px);box-shadow:0 14px 32px rgba(201,96,110,0.28)}
+.btn-link{
+  font-size:0.8rem;letter-spacing:0.1em;color:var(--muted);
+  cursor:pointer;background:none;border:none;
+  display:flex;align-items:center;gap:0.5rem;
+  transition:color 0.2s;
+}
+.btn-link:hover{color:var(--ink)}
+
+/* right col: staggered cards */
+.hero-r{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;gap:1rem;
+  opacity:0;animation:up 0.7s 0.7s ease forwards;
+}
+.stat-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;padding:1.4rem 1.8rem;
+  display:flex;align-items:center;gap:1.4rem;
+  min-height:88px;
+  transition:transform 0.3s,box-shadow 0.3s;
+  animation:float 4s ease-in-out infinite;
+}
+.stat-card:nth-child(2){margin-left:2.5rem;animation-delay:1.3s}
+.stat-card:nth-child(3){animation-delay:2.6s}
+.stat-card:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(44,31,42,0.1)}
+
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.stat-card:nth-child(2){transform:translateX(2.5rem)}
+.stat-card:nth-child(2):hover{transform:translateX(2.5rem) translateY(-4px)}
+
+.stat-icon{
+  width:48px;height:48px;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;
+}
+.stat-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2rem;font-weight:600;color:var(--ink);line-height:1;
+  white-space:nowrap;
+}
+.stat-label{font-size:0.7rem;color:var(--muted);letter-spacing:0.07em;margin-top:3px;white-space:nowrap}
+
+/* ── TICKER ── */
+.ticker{
+  overflow:hidden;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:0.85rem 0;background:var(--bg2);
+}
+.ticker-track{
+  display:flex;width:max-content;
+  animation:tick 22s linear infinite;
+}
+.t-item{
+  font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--muted);padding:0 2.2rem;
+  border-right:1px solid var(--border);white-space:nowrap;
+}
+.t-item.pop{color:var(--rose)}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── ABOUT ── */
+#about{
+  padding:5rem 5rem;
+  background:var(--bg3);
+  position:relative;overflow:hidden;
+}
+#about::before{
+  content:'';position:absolute;
+  width:500px;height:500px;border-radius:50%;
+  background:rgba(123,111,168,0.07);
+  top:-150px;right:-150px;filter:blur(60px);pointer-events:none;
+}
+.about-inner{
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;
+}
+
+.overline{
+  font-size:0.68rem;letter-spacing:0.24em;text-transform:uppercase;
+  color:var(--rose);margin-bottom:1rem;
+  display:flex;align-items:center;gap:0.6rem;
+}
+.overline::before{content:'';width:20px;height:1px;background:var(--rose)}
+
+.sec-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.4rem,4.5vw,3.8rem);
+  font-weight:500;line-height:1.05;margin-bottom:2rem;
+}
+.sec-title em{font-style:italic;color:var(--violet)}
+
+.about-l p{font-size:0.95rem;color:var(--mid);line-height:1.9;margin-bottom:1rem;font-weight:300}
+
+.skill-wrap{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:2rem}
+.sk{
+  padding:0.38rem 1.1rem;border-radius:50px;
+  font-size:0.74rem;letter-spacing:0.04em;font-weight:400;
+  border:1px solid transparent;transition:transform 0.2s,box-shadow 0.2s;cursor:default;
+}
+.sk:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(44,31,42,0.1)}
+
+.about-r{display:flex;flex-direction:column;gap:0}
+
+.facts-panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:22px;padding:1.6rem 1.8rem;
+}
+.facts-panel h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.2rem;font-weight:500;color:var(--violet);margin-bottom:1rem;
+}
+.fact{
+  display:flex;align-items:flex-start;gap:0.9rem;
+  font-size:0.88rem;color:var(--mid);margin-bottom:0.8rem;line-height:1.6;font-weight:300;
+}
+.fact:last-child{margin-bottom:0}
+.fdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+
+/* ── PROJECTS ── */
+#projects{
+  padding:8rem 5rem;
+  background:var(--bg);
+}
+
+.proj-top{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  margin-bottom:3.5rem;
+}
+.proj-top-r{
+  font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--muted);
+}
+
+.proj-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:1.4rem;
+}
+
+.proj-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:26px;overflow:hidden;cursor:pointer;
+  transition:transform 0.35s cubic-bezier(.22,.68,0,1.15),box-shadow 0.35s;
+  position:relative;
+}
+.proj-card:hover{transform:translateY(-7px);box-shadow:0 24px 52px rgba(44,31,42,0.12)}
+
+.card-vis{
+  height:195px;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.card-vis svg{position:absolute;inset:0;width:100%;height:100%}
+.card-em{font-size:3rem;position:relative;z-index:2}
+
+/* arrow badge */
+.card-arrow{
+  position:absolute;top:1.4rem;right:1.4rem;
+  width:34px;height:34px;border-radius:50%;
+  border:1px solid rgba(44,31,42,0.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;color:var(--muted);
+  transition:all 0.3s;z-index:3;
+}
+.proj-card:hover .card-arrow{background:var(--rose);border-color:var(--rose);color:white;transform:rotate(45deg)}
+
+.card-body{padding:1.7rem}
+.card-type{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:500;margin-bottom:0.55rem}
+.card-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.55rem;font-weight:500;color:var(--ink);margin-bottom:0.65rem;line-height:1.15;
+}
+.card-desc{font-size:0.86rem;color:var(--mid);line-height:1.72;margin-bottom:1.1rem;font-weight:300}
+.chips{display:flex;flex-wrap:wrap;gap:0.4rem}
+.chip{font-size:0.68rem;padding:0.24rem 0.8rem;border-radius:50px;letter-spacing:0.04em}
+
+/* ── MODAL ── */
+.mbg{
+  display:none;position:fixed;inset:0;z-index:600;
+  background:rgba(44,31,42,0.6);backdrop-filter:blur(10px);
+  align-items:center;justify-content:center;padding:2rem;
+}
+.mbg.open{display:flex}
+.modal{
+  background:var(--bg);border-radius:30px;
+  max-width:640px;width:100%;max-height:88vh;overflow-y:auto;
+  padding:3.2rem;position:relative;
+  animation:mpop 0.32s cubic-bezier(.22,.68,0,1.2);
+}
+@keyframes mpop{from{opacity:0;transform:scale(0.94) translateY(14px)}to{opacity:1;transform:none}}
+.mclose{
+  position:absolute;top:1.6rem;right:1.8rem;
+  width:36px;height:36px;border-radius:50%;
+  border:1px solid var(--border);background:none;
+  font-size:1.1rem;cursor:pointer;color:var(--muted);
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;
+}
+.mclose:hover{background:var(--rose);color:white;border-color:var(--rose)}
+.mtag{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;font-weight:500;margin-bottom:0.7rem}
+.mtitle{
+  font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:500;
+  color:var(--ink);margin-bottom:1.5rem;line-height:1.1;
+}
+.mbody{font-size:0.93rem;color:var(--mid);line-height:1.9;font-weight:300}
+.mbody p{margin-bottom:0.9rem}
+.mbody h4{
+  font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:500;
+  color:var(--ink);margin:1.8rem 0 0.5rem;
+}
+.mchips{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1.8rem}
+.mchip{font-size:0.74rem;padding:0.32rem 0.95rem;border-radius:50px}
+
+/* ── CONTACT ── */
+#contact{
+  padding:8rem 5rem;background:var(--bg3);
+  display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;
+}
+.contact-l p{font-size:0.95rem;color:var(--mid);line-height:1.85;font-weight:300;max-width:360px;margin-top:1.2rem}
+
+.contact-r{display:flex;flex-direction:column;gap:0.9rem}
+.clink{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.25rem 1.7rem;border-radius:16px;
+  border:1px solid var(--border);background:var(--card);
+  text-decoration:none;color:var(--ink);
+  transition:all 0.28s cubic-bezier(.22,.68,0,1.15);
+}
+.clink:hover{background:var(--rose);color:white;border-color:var(--rose);transform:translateX(6px)}
+.clink:hover .cl-sub{color:rgba(255,255,255,0.65)}
+.clink:hover .cl-arr{color:white;transform:rotate(-45deg)}
+.cl-l{display:flex;align-items:center;gap:1rem}
+.cl-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;transition:background 0.2s}
+.clink:hover .cl-dot{background:rgba(255,255,255,0.5)!important}
+.cl-name{font-size:0.93rem;font-weight:500}
+.cl-sub{font-size:0.74rem;color:var(--muted);letter-spacing:0.04em;transition:color 0.2s}
+.cl-arr{color:var(--muted);font-size:1.1rem;transition:all 0.22s}
+
+footer{
+  text-align:center;padding:2.2rem;
+  border-top:1px solid var(--border);
+  font-size:0.74rem;color:var(--muted);letter-spacing:0.1em;
+  background:var(--bg3);
+}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity 0.7s ease,transform 0.7s ease}
+.rv.on{opacity:1;transform:none}
+.d1{transition-delay:0.12s}.d2{transition-delay:0.24s}
+
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="#home" class="nav-logo">your name<sup>✦</sup></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Work</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="ring ring1"></div>
+  <div class="ring ring2"></div>
+  <div class="ring ring3"></div>
+  <div class="ink-blob ib1"></div>
+  <div class="ink-blob ib2"></div>
+
+  <div class="hero-l">
+    <div class="hero-tag">
+      <div class="hero-tag-dot">✦</div>
+      <span>Available for opportunities</span>
+    </div>
+    <h1>Hi, I'm<br><em>Your Name.</em><br>I find <span class="ghost">stories</span><br>in numbers.</h1>
+    <p class="hero-desc">I turn messy datasets into clear insights — with a love for beautiful visualizations, thoughtful analysis, and the occasional cup of tea.</p>
+    <div class="hero-btns">
+      <button class="btn-fill" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth'})">View my work →</button>
+      <button class="btn-link" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Say hello ✦</button>
+    </div>
+  </div>
+
+  <div class="hero-r">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(201,96,110,0.15)">📊</div>
+      <div><div class="stat-num">12+</div><div class="stat-label">Projects completed</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(123,111,168,0.15)">🤖</div>
+      <div><div class="stat-num">87%</div><div class="stat-label">Best model accuracy</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(90,143,118,0.15)">✨</div>
+      <div><div class="stat-num">2M+</div><div class="stat-label">Rows cleaned & counting</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="t-item pop">Python</span><span class="t-item">SQL</span><span class="t-item">Tableau</span><span class="t-item pop">Pandas</span><span class="t-item">Scikit-learn</span><span class="t-item">Power BI</span><span class="t-item pop">XGBoost</span><span class="t-item">dbt</span><span class="t-item">Seaborn</span><span class="t-item pop">Jupyter</span><span class="t-item">PostgreSQL</span><span class="t-item">Matplotlib</span>
+    <span class="t-item pop">Python</span><span class="t-item">SQL</span><span class="t-item">Tableau</span><span class="t-item pop">Pandas</span><span class="t-item">Scikit-learn</span><span class="t-item">Power BI</span><span class="t-item pop">XGBoost</span><span class="t-item">dbt</span><span class="t-item">Seaborn</span><span class="t-item pop">Jupyter</span><span class="t-item">PostgreSQL</span><span class="t-item">Matplotlib</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-inner">
+    <div class="about-l rv">
+      <p class="overline">about me</p>
+      <h2 class="sec-title">Curious by nature,<br><em>precise</em> by practice.</h2>
+      <p>I'm a data analyst who genuinely gets excited about finding hidden patterns. Great analysis isn't just technically sound — it tells a story anyone can understand.</p>
+      <p>Currently open to full-time roles and freelance projects.</p>
+      <div class="skill-wrap">
+        <span class="sk" style="background:rgba(201,96,110,0.15);color:var(--rose);border-color:rgba(201,96,110,0.2)">Python</span>
+        <span class="sk" style="background:rgba(123,111,168,0.15);color:var(--violet);border-color:rgba(123,111,168,0.2)">SQL</span>
+        <span class="sk" style="background:rgba(90,143,118,0.15);color:var(--sage);border-color:rgba(90,143,118,0.2)">Tableau</span>
+        <span class="sk" style="background:rgba(192,136,64,0.15);color:var(--amber);border-color:rgba(192,136,64,0.2)">Power BI</span>
+        <span class="sk" style="background:rgba(201,96,110,0.15);color:var(--rose);border-color:rgba(201,96,110,0.2)">Pandas</span>
+        <span class="sk" style="background:rgba(123,111,168,0.15);color:var(--violet);border-color:rgba(123,111,168,0.2)">Scikit-learn</span>
+        <span class="sk" style="background:rgba(90,143,118,0.15);color:var(--sage);border-color:rgba(90,143,118,0.2)">dbt</span>
+        <span class="sk" style="background:rgba(192,136,64,0.15);color:var(--amber);border-color:rgba(192,136,64,0.2)">XGBoost</span>
+      </div>
+    </div>
+
+    <div class="about-r rv d1">
+      <div class="facts-panel">
+        <h3>fun facts ✦</h3>
+        <div class="fact"><span class="fdot" style="background:var(--rose)"></span><span>Coffee-to-insight converter since 2020</span></div>
+        <div class="fact"><span class="fdot" style="background:var(--violet)"></span><span>Obsessed with color theory — especially in charts</span></div>
+        <div class="fact"><span class="fdot" style="background:var(--sage)"></span><span>Avid plant parent & amateur baker 🌱</span></div>
+        <div class="fact"><span class="fdot" style="background:var(--amber)"></span><span>Cleaned a 500k-row dataset before breakfast once</span></div>
+        <div class="fact"><span class="fdot" style="background:var(--rose)"></span><span>Firm believer that pie charts have their place 🥧</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="proj-top rv">
+    <div>
+      <p class="overline">selected work</p>
+      <h2 class="sec-title" style="margin-bottom:0">Projects I'm<br><em>proud of</em></h2>
+    </div>
+    <p class="proj-top-r">Click any card<br>to read more</p>
+  </div>
+
+  <div class="proj-grid">
+    <div class="proj-card rv" onclick="openModal('dash')">
+      <div class="card-vis" style="background:linear-gradient(135deg,#c9818a,#a85a65)">
+        <svg viewBox="0 0 400 195" preserveAspectRatio="xMidYMid slice">
+          <rect x="40" y="85" width="40" height="85" rx="5" fill="rgba(255,255,255,0.2)"/>
+          <rect x="100" y="58" width="40" height="112" rx="5" fill="rgba(255,255,255,0.28)"/>
+          <rect x="160" y="28" width="40" height="142" rx="5" fill="rgba(255,255,255,0.35)"/>
+          <rect x="220" y="65" width="40" height="105" rx="5" fill="rgba(255,255,255,0.25)"/>
+          <rect x="280" y="40" width="40" height="130" rx="5" fill="rgba(255,255,255,0.3)"/>
+          <polyline points="60,90 120,62 180,32 240,70 300,45 350,55" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2.5"/>
+          <circle cx="180" cy="32" r="5" fill="white"/><circle cx="300" cy="45" r="5" fill="white"/>
+        </svg>
+        <span class="card-em">📊</span>
+      </div>
+      <div class="card-body">
+        <span class="card-arrow">↗</span>
+        <p class="card-type" style="color:var(--rose)">Dashboard & Visualization</p>
+        <h3 class="card-title">Sales Performance Dashboard</h3>
+        <p class="card-desc">Interactive Tableau dashboard tracking KPIs across regions with drill-down and trend forecasting.</p>
+        <div class="chips">
+          <span class="chip" style="background:rgba(201,96,110,0.12);color:var(--rose)">Tableau</span>
+          <span class="chip" style="background:rgba(201,96,110,0.12);color:var(--rose)">SQL</span>
+          <span class="chip" style="background:rgba(201,96,110,0.12);color:var(--rose)">Excel</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-card rv d1" onclick="openModal('churn')">
+      <div class="card-vis" style="background:linear-gradient(135deg,#7b6fa8,#5a508a)">
+        <svg viewBox="0 0 400 195" preserveAspectRatio="xMidYMid slice">
+          <circle cx="140" cy="97" r="70" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+          <circle cx="140" cy="97" r="45" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="2"/>
+          <circle cx="140" cy="97" r="22" fill="rgba(255,255,255,0.18)"/>
+          <line x1="215" y1="48" x2="330" y2="78" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+          <line x1="215" y1="97" x2="355" y2="97" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+          <line x1="215" y1="146" x2="330" y2="116" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+          <circle cx="334" cy="78" r="11" fill="rgba(255,255,255,0.35)"/>
+          <circle cx="356" cy="97" r="16" fill="rgba(255,255,255,0.28)"/>
+          <circle cx="334" cy="116" r="8" fill="rgba(255,255,255,0.35)"/>
+        </svg>
+        <span class="card-em">🤖</span>
+      </div>
+      <div class="card-body">
+        <span class="card-arrow">↗</span>
+        <p class="card-type" style="color:var(--violet)">Machine Learning</p>
+        <h3 class="card-title">Customer Churn Predictor</h3>
+        <p class="card-desc">Classification model predicting churn with 87% accuracy using feature engineering and XGBoost.</p>
+        <div class="chips">
+          <span class="chip" style="background:rgba(123,111,168,0.12);color:var(--violet)">Python</span>
+          <span class="chip" style="background:rgba(123,111,168,0.12);color:var(--violet)">Scikit-learn</span>
+          <span class="chip" style="background:rgba(123,111,168,0.12);color:var(--violet)">XGBoost</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-card rv" onclick="openModal('sql')">
+      <div class="card-vis" style="background:linear-gradient(135deg,#5a8f76,#3d6e58)">
+        <svg viewBox="0 0 400 195" preserveAspectRatio="xMidYMid slice">
+          <rect x="30" y="30" width="340" height="26" rx="5" fill="rgba(255,255,255,0.2)"/>
+          <rect x="30" y="72" width="340" height="19" rx="4" fill="rgba(255,255,255,0.15)"/>
+          <rect x="30" y="104" width="270" height="19" rx="4" fill="rgba(255,255,255,0.15)"/>
+          <rect x="30" y="136" width="310" height="19" rx="4" fill="rgba(255,255,255,0.15)"/>
+          <rect x="30" y="168" width="220" height="19" rx="4" fill="rgba(255,255,255,0.15)"/>
+          <rect x="30" y="30" width="9" height="157" fill="rgba(255,255,255,0.35)"/>
+        </svg>
+        <span class="card-em">🧹</span>
+      </div>
+      <div class="card-body">
+        <span class="card-arrow">↗</span>
+        <p class="card-type" style="color:var(--sage)">SQL & Data Cleaning</p>
+        <h3 class="card-title">E-commerce Data Pipeline</h3>
+        <p class="card-desc">Cleaned 2M+ rows of raw transaction data, building reusable SQL queries for monthly reporting.</p>
+        <div class="chips">
+          <span class="chip" style="background:rgba(90,143,118,0.12);color:var(--sage)">PostgreSQL</span>
+          <span class="chip" style="background:rgba(90,143,118,0.12);color:var(--sage)">dbt</span>
+          <span class="chip" style="background:rgba(90,143,118,0.12);color:var(--sage)">Python</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="proj-card rv d1" onclick="openModal('story')">
+      <div class="card-vis" style="background:linear-gradient(135deg,#c08840,#9a6828)">
+        <svg viewBox="0 0 400 195" preserveAspectRatio="xMidYMid slice">
+          <path d="M 30 158 Q 100 75 180 108 T 370 52" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="3"/>
+          <path d="M 30 172 Q 100 92 180 125 T 370 70" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+          <circle cx="180" cy="108" r="8" fill="white" opacity="0.8"/>
+          <circle cx="100" cy="118" r="5" fill="white" opacity="0.6"/>
+          <circle cx="280" cy="74" r="7" fill="white" opacity="0.7"/>
+          <circle cx="370" cy="52" r="9" fill="white" opacity="0.6"/>
+          <line x1="180" y1="108" x2="180" y2="165" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <line x1="370" y1="52" x2="370" y2="165" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        </svg>
+        <span class="card-em">📖</span>
+      </div>
+      <div class="card-body">
+        <span class="card-arrow">↗</span>
+        <p class="card-type" style="color:var(--amber)">Storytelling with Data</p>
+        <h3 class="card-title">City Health Trends Report</h3>
+        <p class="card-desc">Narrative Jupyter notebook exploring 10 years of public health data with annotated visualizations.</p>
+        <div class="chips">
+          <span class="chip" style="background:rgba(192,136,64,0.12);color:var(--amber)">Matplotlib</span>
+          <span class="chip" style="background:rgba(192,136,64,0.12);color:var(--amber)">Seaborn</span>
+          <span class="chip" style="background:rgba(192,136,64,0.12);color:var(--amber)">Jupyter</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-l rv">
+    <p class="overline">get in touch</p>
+    <h2 class="sec-title">Let's make something <em>great</em> together.</h2>
+    <p>Open to full-time roles, freelance projects, and just good conversations about data. I'd love to hear from you.</p>
+  </div>
+  <div class="contact-r rv d1">
+    <a href="mailto:you@email.com" class="clink">
+      <div class="cl-l"><span class="cl-dot" style="background:var(--rose)"></span><div><div class="cl-name">Email me</div><div class="cl-sub">you@email.com</div></div></div>
+      <span class="cl-arr">↗</span>
+    </a>
+    <a href="https://linkedin.com" target="_blank" class="clink">
+      <div class="cl-l"><span class="cl-dot" style="background:var(--violet)"></span><div><div class="cl-name">LinkedIn</div><div class="cl-sub">Connect with me</div></div></div>
+      <span class="cl-arr">↗</span>
+    </a>
+    <a href="https://github.com" target="_blank" class="clink">
+      <div class="cl-l"><span class="cl-dot" style="background:var(--sage)"></span><div><div class="cl-name">GitHub</div><div class="cl-sub">See my code</div></div></div>
+      <span class="cl-arr">↗</span>
+    </a>
+    <a href="#" class="clink">
+      <div class="cl-l"><span class="cl-dot" style="background:var(--amber)"></span><div><div class="cl-name">Resume</div><div class="cl-sub">Download PDF</div></div></div>
+      <span class="cl-arr">↗</span>
+    </a>
+  </div>
+</section>
+
+<footer>crafted with ✦ and lots of data &nbsp;·&nbsp; © 2025 your name</footer>
+
+<!-- MODAL -->
+<div class="mbg" id="mbg" onclick="closeBg(event)">
+  <div class="modal">
+    <button class="mclose" onclick="closeModal()">×</button>
+    <div id="mcontent"></div>
+  </div>
+</div>
+
+<script>
+const MD={
+  dash:{tag:'Dashboard & Visualization',color:'var(--rose)',title:'Sales Performance Dashboard',
+    body:`<p>End-to-end Tableau dashboard for a retail client — replacing weekly spreadsheet reports with a live interactive view across 12 regions.</p>
+    <h4>What I did</h4><p>Connected Tableau to PostgreSQL, wrote CTEs to clean and join four source tables, designed drill-down from national → regional → store level. Added YoY comparison and a 90-day rolling trend line.</p>
+    <h4>Key result</h4><p>Reduced weekly reporting prep from 4 hours to 20 minutes. Still in active use.</p><h4>Stack</h4>`,
+    chips:['Tableau','PostgreSQL','SQL CTEs','Data modeling','Stakeholder comms'],cs:'background:rgba(201,96,110,0.12);color:var(--rose)'},
+  churn:{tag:'Machine Learning',color:'var(--violet)',title:'Customer Churn Predictor',
+    body:`<p>Binary classification model for a SaaS company to flag at-risk customers before renewal, giving the CS team time to intervene.</p>
+    <h4>Approach</h4><p>EDA to surface churn signals (login frequency, feature adoption, support tickets). Engineered 14 features, balanced with SMOTE, compared LR vs RF vs XGBoost.</p>
+    <h4>Results</h4><p>87% accuracy, 0.91 AUC-ROC. Flagged 73% of churned customers in the following quarter.</p><h4>Stack</h4>`,
+    chips:['Python','Pandas','Scikit-learn','XGBoost','SMOTE','SHAP'],cs:'background:rgba(123,111,168,0.12);color:var(--violet)'},
+  sql:{tag:'SQL & Data Cleaning',color:'var(--sage)',title:'E-commerce Data Pipeline',
+    body:`<p>Inherited a chaotic legacy database — duplicate orders, inconsistent IDs, three date formats in one column.</p>
+    <h4>The challenge</h4><p>2.4M rows across 9 tables, no data dictionary. Business needed clean monthly revenue reports they could trust.</p>
+    <h4>What I built</h4><p>A dbt project with modular SQL transforms: staging → intermediate → mart. Data quality tests at every layer.</p><h4>Stack</h4>`,
+    chips:['PostgreSQL','dbt','Python','Data modeling','Data quality testing'],cs:'background:rgba(90,143,118,0.12);color:var(--sage)'},
+  story:{tag:'Storytelling with Data',color:'var(--amber)',title:'City Health Trends Report',
+    body:`<p>Personal project turning raw government health data into a narrative that non-technical readers can engage with.</p>
+    <h4>The story</h4><p>10 years of air quality, hospital admissions, and income data. Found a striking correlation between air quality dips and respiratory admissions in lower-income zip codes.</p>
+    <h4>The output</h4><p>Fully annotated Jupyter notebook with custom Matplotlib charts and narrative text. Published on GitHub Pages.</p><h4>Stack</h4>`,
+    chips:['Python','Pandas','Matplotlib','Seaborn','Jupyter','Data journalism'],cs:'background:rgba(192,136,64,0.12);color:var(--amber)'}
+};
+function openModal(id){
+  const m=MD[id];
+  document.getElementById('mcontent').innerHTML=`
+    <p class="mtag" style="color:${m.color}">${m.tag}</p>
+    <h2 class="mtitle">${m.title}</h2>
+    <div class="mbody">${m.body}</div>
+    <div class="mchips">${m.chips.map(c=>`<span class="mchip" style="${m.cs}">${c}</span>`).join('')}</div>`;
+  document.getElementById('mbg').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){document.getElementById('mbg').classList.remove('open');document.body.style.overflow='';}
+function closeBg(e){if(e.target===document.getElementById('mbg'))closeModal();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(en=>{if(en.isIntersecting)en.target.classList.add('on');});
+},{threshold:0.1});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',scrollY>60);
+});
+</script>
+</body>
+</html>
